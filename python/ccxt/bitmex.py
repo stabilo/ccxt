@@ -158,16 +158,20 @@ class bitmex (Exchange):
             else:
                 future = True
                 type = 'future'
-            maker = market['makerFee']
-            taker = market['takerFee']
+            precision = {
+                'amount': 2,
+            }
             result.append({
                 'id': id,
                 'symbol': symbol,
                 'base': base,
+                'precision': precision,
+                'tick_size': market['tickSize'],
                 'quote': quote,
                 'active': active,
-                'taker': taker,
-                'maker': maker,
+                'lot': market['lotSize'],
+                'taker': market['takerFee'],
+                'maker': market['makerFee'],
                 'type': type,
                 'spot': False,
                 'swap': swap,
@@ -433,6 +437,8 @@ class bitmex (Exchange):
         order = response[0]
         error = self.safe_string(order, 'error')
         if error is not None:
+            if error.find('Filled'):
+                return self.parse_order(order)
             if error.find('Unable to cancel order due to existing state') >= 0:
                 raise OrderNotFound(self.id + ' cancelOrder() failed: ' + error)
         return self.parse_order(order)

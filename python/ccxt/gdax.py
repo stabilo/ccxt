@@ -163,6 +163,8 @@ class gdax (Exchange):
                 'base': base,
                 'quote': quote,
                 'precision': precision,
+                'lot':0.001,
+                'tick_size':float(market['quote_increment']),
                 'limits': {
                     'amount': {
                         'min': self.safe_float(market, 'base_min_size'),
